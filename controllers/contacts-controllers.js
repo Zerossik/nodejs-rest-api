@@ -7,80 +7,60 @@ const {
   removeContact,
   updateContact,
 } = require("../models/contacts.js");
+const decorator = require("../decorators/controller-decorator.js");
 const schema = joi.object({
   name: joi.string().required(),
   email: joi.string().required(),
   phone: joi.string().required(),
 });
 
-const getAll = async (req, res, next) => {
-  try {
-    const result = await listContacts();
-    res.json(result);
-  } catch (error) {
-    next(error);
-  }
+const getAll = async (req, res) => {
+  const result = await listContacts();
+  res.json(result);
 };
 
-const getById = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await getContactById(contactId);
-    if (!result) {
-      throw reqError(404, "NotFound");
-    }
-
-    res.json(result);
-  } catch (error) {
-    next(error);
+const getById = async (req, res) => {
+  const { contactId } = req.params;
+  const result = await getContactById(contactId);
+  if (!result) {
+    throw reqError(404, "NotFound");
   }
+  res.json(result);
 };
 
-const postContact = async (req, res, next) => {
-  try {
-    const { error } = schema.validate(req.body);
-    if (error) {
-      throw reqError(400, "missing required name field");
-    }
-    const result = await addContact(req.body);
-    res.status(201).json(result);
-  } catch (error) {
-    next(error);
+const postContact = async (req, res) => {
+  const { error } = schema.validate(req.body);
+  if (error) {
+    throw reqError(400, "missing required name field");
   }
+  const result = await addContact(req.body);
+  res.status(201).json(result);
 };
 
-const deleteContact = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const result = await removeContact(contactId);
-    if (!result) throw reqError(404, "Not found");
-    res.status(200).json({ message: "contact deleted" });
-  } catch (error) {
-    next(error);
-  }
+const deleteContact = async (req, res) => {
+  const { contactId } = req.params;
+  const result = await removeContact(contactId);
+  if (!result) throw reqError(404, "Not found");
+  res.status(200).json({ message: "contact deleted" });
 };
 
-const update = async (req, res, next) => {
-  try {
-    const { contactId } = req.params;
-    const { error } = schema.validate(req.body);
-    const result = await updateContact(contactId, req.body);
-    if (error) {
-      throw reqError(400, "missing fields");
-    } else if (!result) {
-      throw reqError(404, "Not found");
-    }
-
-    res.json(result);
-  } catch (error) {
-    next(error);
+const update = async (req, res) => {
+  const { contactId } = req.params;
+  const { error } = schema.validate(req.body);
+  const result = await updateContact(contactId, req.body);
+  if (error) {
+    throw reqError(400, "missing fields");
+  } else if (!result) {
+    throw reqError(404, "Not found");
   }
+
+  res.json(result);
 };
 
 module.exports = {
-  getAll,
-  getById,
-  postContact,
-  deleteContact,
-  update,
+  getAll: decorator(getAll),
+  getById: decorator(getById),
+  postContact: decorator(postContact),
+  deleteContact: decorator(deleteContact),
+  update: decorator(update),
 };
