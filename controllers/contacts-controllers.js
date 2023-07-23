@@ -1,27 +1,19 @@
-const reqError = require("../helpers/reqError.js");
-const joi = require("joi");
 const {
-  listContacts,
-  getContactById,
-  addContact,
-  removeContact,
-  updateContact,
+  Contact,
+  schemaJoi,
+  schemaJoiUpdateFavorite,
 } = require("../models/contacts.js");
+const reqError = require("../helpers/reqError.js");
 const decorator = require("../decorators/controller-decorator.js");
-const schema = joi.object({
-  name: joi.string().required(),
-  email: joi.string().required(),
-  phone: joi.string().required(),
-});
 
 const getAll = async (req, res) => {
-  const result = await listContacts();
+  const result = await Contact.find();
   res.json(result);
 };
 
 const getById = async (req, res) => {
   const { contactId } = req.params;
-  const result = await getContactById(contactId);
+  const result = await Contact.findById(contactId);
   if (!result) {
     throw reqError(404, "NotFound");
   }
@@ -29,25 +21,27 @@ const getById = async (req, res) => {
 };
 
 const postContact = async (req, res) => {
-  const { error } = schema.validate(req.body);
+  const { error } = schemaJoi.validate(req.body);
   if (error) {
     throw reqError(400, "missing required name field");
   }
-  const result = await addContact(req.body);
+  const result = await Contact.create(req.body);
   res.status(201).json(result);
 };
 
 const deleteContact = async (req, res) => {
   const { contactId } = req.params;
-  const result = await removeContact(contactId);
+  const result = await Contact.findByIdAndRemove(contactId);
   if (!result) throw reqError(404, "Not found");
   res.status(200).json({ message: "contact deleted" });
 };
 
 const update = async (req, res) => {
   const { contactId } = req.params;
-  const { error } = schema.validate(req.body);
-  const result = await updateContact(contactId, req.body);
+  const { error } = schemaJoi.validate(req.body);
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
   if (error) {
     throw reqError(400, "missing fields");
   } else if (!result) {
@@ -57,10 +51,26 @@ const update = async (req, res) => {
   res.json(result);
 };
 
+const updateFavorite = async (req, res) => {
+  const { contactId } = req.params;
+  const { error } = schemaJoiUpdateFavorite.validate(req.body);
+  if (error) {
+    throw reqError(400, "missing fields favorite");
+  }
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+  });
+  if (!result) {
+    throw reqError(404, "Not Found");
+  }
+  res.json(result);
+};
+
 module.exports = {
   getAll: decorator(getAll),
   getById: decorator(getById),
   postContact: decorator(postContact),
   deleteContact: decorator(deleteContact),
   update: decorator(update),
+  updateFavorite: decorator(updateFavorite),
 };
