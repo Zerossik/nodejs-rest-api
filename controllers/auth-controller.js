@@ -24,13 +24,14 @@ const signIn = async (req, res) => {
   const { email, password } = req.body;
   const { SECRET_KEY } = process.env;
   const user = await User.findOne({ email });
-  if (!user) throw reqError(401);
+  if (!user) throw reqError(401, "invalid email or password");
   const checkPasswors = await bcrypt.compare(password, user.password);
-  if (!checkPasswors) throw reqError(401);
+  if (!checkPasswors) throw reqError(401, "invalid email or password");
   const payload = {
     id: user._id,
   };
-  const token = jwt.sign(payload, SECRET_KEY);
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "30d" });
+
   res.json({ token });
 };
 

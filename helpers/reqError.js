@@ -7,7 +7,7 @@ const statusError = {
 
 const reqError = (status, message = "") => {
   const error = new Error(
-    `${status} ${statusError[status] ? statusError[status] : message}`
+    `${status} ${message === "" ? statusError[status] : message}`
   );
   error.status = status;
   return error;
