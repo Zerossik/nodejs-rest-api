@@ -9,3 +9,5 @@ const validateBody = (schema) => {
     next();
   };
 };
+
+module.exports = validateBody;
