@@ -1,5 +1,5 @@
 const express = require("express");
-const isValidId = require("../../middleware/isValidId.js");
+const { isValidId, authenticate } = require("../../middleware/index.js");
 const {
   getAll,
   getById,
@@ -10,6 +10,7 @@ const {
 } = require("../../controllers/contacts-controllers.js");
 
 const router = express.Router();
+router.use(authenticate);
 
 router.get("/", getAll);
 
