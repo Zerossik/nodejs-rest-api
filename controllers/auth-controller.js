@@ -3,6 +3,7 @@ const decorator = require("../decorators/controller-decorator.js");
 const reqError = require("../helpers/reqError.js");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const gravatar = require("gravatar");
 
 const signUp = async (req, res) => {
   const { email, password } = req.body;
@@ -12,8 +13,12 @@ const signUp = async (req, res) => {
     throw reqError(409, "Email in use");
   }
   const hashPassword = await bcrypt.hash(password, 10);
-
-  const result = await User.create({ ...req.body, password: hashPassword });
+  const avatarURL = gravatar.url(email, { s: 100 }, false);
+  const result = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL,
+  });
   res.status(201).json({
     email: result.email,
     subscription: result.subscription,
