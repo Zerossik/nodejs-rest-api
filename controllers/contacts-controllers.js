@@ -7,7 +7,13 @@ const reqError = require("../helpers/reqError.js");
 const decorator = require("../decorators/controller-decorator.js");
 
 const getAll = async (req, res) => {
-  const result = await Contact.find();
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 1 } = req.query;
+  const skip = (page - 1) * limit;
+  const result = await Contact.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  });
   res.json(result);
 };
 
@@ -22,10 +28,11 @@ const getById = async (req, res) => {
 
 const postContact = async (req, res) => {
   const { error } = schemaJoi.validate(req.body);
+  const { _id: owner } = req.user;
   if (error) {
     throw reqError(400, "missing required name field");
   }
-  const result = await Contact.create(req.body);
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };
 
