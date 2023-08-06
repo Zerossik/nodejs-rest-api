@@ -4,10 +4,10 @@ const {
   signIn,
   getCurrent,
   logout,
-} = require("../controllers/auth-controller.js");
-const { validateBody } = require("../decorators/index.js");
-const { authSchemaJoi } = require("../models/user.js");
-const { authenticate } = require("../middleware/index.js");
+} = require("../../controllers/auth-controller.js");
+const { validateBody } = require("../../decorators/index.js");
+const { authSchemaJoi } = require("../../models/user.js");
+const { authenticate } = require("../../middleware/index.js");
 
 const authRouter = express.Router();
 
