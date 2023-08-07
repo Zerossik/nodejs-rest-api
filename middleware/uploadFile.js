@@ -5,7 +5,6 @@ const storage = multer.diskStorage({
   destination: path,
   filename: (req, file, cb) => {
     const prefix = `${Date.now()}-${Math.round(Math.random() * 1e9)} `;
-    console.log(prefix);
     cb(null, `${prefix}_${file.originalname}`);
   },
 });
