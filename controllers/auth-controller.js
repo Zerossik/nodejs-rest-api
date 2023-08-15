@@ -7,6 +7,7 @@ const { sendEmail } = require("../helpers/index.js");
 const { nanoid } = require("nanoid");
 
 const { BASE_URL } = process.env;
+const gravatar = require("gravatar");
 
 const signUp = async (req, res) => {
   const { email, password } = req.body;
